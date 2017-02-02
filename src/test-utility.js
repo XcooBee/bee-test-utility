@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+const path = require("path");
 const fs = require("fs");
 
 let parametersFilePath = "parameters.json";
-let outputPath = "./";
+let outputPath = path.resolve("./");
 let ttl = 30000;
 
 // The amount of time reserved for clean up tasks
@@ -29,7 +29,6 @@ const timeToCleanUp = 5000;
 const streamArray = [];
 
 const argv = process.argv;
-
 let callbackCalled = false;
 
 const closeStreams = () => {
@@ -45,15 +44,56 @@ const getNextId = () => {
     return current;
 };
 
+const createServices = (inputFilePath) => {
+    // TODO: Validation for fileName, what should happen if the user requests a writeStream for an 
+    // already created fileName
+    // Create the services object
+    const services = {
+        // Just log a message to the system console
+        log: (message, type) => {
+            const chunk = `${Date.now()},${type},${message}\n`;
+            console.log(chunk);
+        },
+        // email service to mock the sending of an email
+        mail: () => {
+            // TODO: What do in here? Log something? Do Nothing?
+        },
+        getNextId,
+        addParam: (key, value) => {
+            console.log(`${key} => ${value} added to the next bee`);
+        },
+        timeToRun: () => ttl,
+        // The default streams for reading and writing
+        readStream: fs.createReadStream(inputFilePath),
+        writeStream: fs.createWriteStream(`${outputPath}${path.sep}output${path.sep}bee_default_output`),
+        writeStreamManager: () => ({
+            getWriteStream: (fileName, type) => {
+                const typePath = type === "wip" ? "workFiles" : "output";
+                const stream = fs.createWriteStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
+                streamArray.push(stream);
+                return stream;
+            },
+            getReadStream: (fileName, type) => {
+                const typePath = type === "wip" ? "workFiles" : "output";
+                const stream = fs.createReadStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
+                return stream;
+            },
+        }),
+    };
+
+    return services;
+};
+
 // Assume we are on the node project directory
 // unless otherwise specified by the --bee switch
 let beeModule = null;
 try {
     const beeIndex = argv.indexOf("--bee");
     if (beeIndex !== -1) {
-        beeModule = require(argv[beeIndex + 1]);
+        beeModule = require(path.resolve(argv[beeIndex + 1]));
     } else {
-        beeModule = require(".");
+        // TODO: Don't rely on cwd
+        beeModule = require(process.cwd());
     }
 } catch (err) {
     console.log("It was not possible to load the bee, make sure you are inside a valid node project or use the '--bee' switch");
@@ -89,7 +129,7 @@ ttl -= timeToCleanUp;
 // an user error pointing to an unexistent file
 const paramsIndex = argv.indexOf("--params");
 if (paramsIndex !== -1) {
-    parametersFilePath = argv[paramsIndex + 1];
+    parametersFilePath = path.resolve(argv[paramsIndex + 1]);
 
     if (!fs.existsSync(parametersFilePath)) {
         console.log(`${parametersFilePath} doesn't exist`);
@@ -101,7 +141,13 @@ if (paramsIndex !== -1) {
 // The output directory must exists, the utility WON'T create it
 const outputIndex = argv.indexOf("--out");
 if (outputIndex !== -1) {
-    outputPath = argv[outputIndex + 1];
+    outputPath = path.resolve(argv[outputIndex + 1]);
+
+    // TODO: A way to create the hierarchy
+    if (!fs.existsSync(outputPath)) {
+        console.log(`${outputPath} is not a valid directory`);
+        process.exit(1);
+    }
 
     const stats = fs.lstatSync(outputPath);
 
@@ -109,54 +155,25 @@ if (outputIndex !== -1) {
         console.log(`${outputPath} is not a valid directory`);
         process.exit(1);
     }
+}
 
-    if (!outputPath.endsWith("/")) {
-        outputPath = outputPath.concat("/");
-    }
+if (!fs.existsSync(`${outputPath}${path.sep}output`)) {
+    fs.mkdirSync(`${outputPath}${path.sep}output`);
+}
+
+if (!fs.existsSync(`${outputPath}${path.sep}workFiles`)) {
+    fs.mkdirSync(`${outputPath}${path.sep}workFiles`);
 }
 
 // The input file must be the first argument
-const inputFilePath = argv[2];
+const inputFilePath = path.resolve(argv[2]);
 
 if (!fs.existsSync(inputFilePath)) {
     console.log(`Input file '${inputFilePath}' doesn't exist`);
     process.exit(1);
 }
-// TODO: Validation for fileName, what should happen if the user requests a writeStream for an 
-// already created fileName
-// Create the services object
-const services = {
-    // Just log a message to the system console
-    log: (message, type) => {
-        const chunk = `${Date.now()},${type},${message}\n`;
-        console.log(chunk);
-    },
-    // email service to mock the sending of an email
-    mail: () => {
-        // TODO: What do in here? Log something? Do Nothing?
-    },
-    getNextId,
-    addParam: (key, value) => {
-        console.log(`${key} => ${value} added to the next bee`);
-    },
-    timeToRun: () => ttl,
-    // The default streams for reading and writing
-    readStream: fs.createReadStream(inputFilePath),
-    writeStream: fs.createWriteStream(`${outputPath}output/bee_default_output`),
-    writeStreamManager: () => ({
-        getWriteStream: (fileName, type) => {
-            const typePath = type === "wip" ? "workFiles/" : "output/";
-            const stream = fs.createWriteStream(`${outputPath}${typePath}${fileName}`);
-            streamArray.push(stream);
-            return stream;
-        },
-        getReadStream: (fileName, type) => {
-            const typePath = type === "wip" ? "workFiles/" : "output/";
-            const stream = fs.createReadStream(`${outputPath}${typePath}${fileName}`);
-            return stream;
-        },
-    }),
-};
+
+const services = createServices(inputFilePath);
 
 const data = {
     // Mock data just for testing purposes

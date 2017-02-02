@@ -2,7 +2,7 @@
   "name": "bee-test-utility",
   "version": "1.0.0",
   "description": "The utility used to test bees that will be published in XcooBee network",
-  "main": "test-utility.js",
+  "main": "index.js",
   "scripts": {
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec"
   },
