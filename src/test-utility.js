@@ -20,7 +20,7 @@ const runTest = (argv, callback) => {
     const fs = require("fs");
 
     let parametersFilePath = path.resolve("./parameters.json");
-    let outputPath = path.resolve("./");
+    let outputPath = path.resolve(".");
     let ttl = 30000;
     // How long have we been running?
     let ellapsed = 0;
@@ -68,7 +68,6 @@ const runTest = (argv, callback) => {
             // The default streams for reading and writing
             readStream: fs.createReadStream(inputFilePath),
             // TODO: Should overwrite the files
-            writeStream: fs.createWriteStream(`${outputPath}${path.sep}output${path.sep}bee_default_output`),
             writeStreamManager: () => ({
                 getWriteStream: (fileName, type) => {
                     const typePath = type === "wip" ? "workFiles" : "output";
