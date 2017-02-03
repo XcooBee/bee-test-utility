@@ -222,6 +222,9 @@ const runTest = (argv, callback) => {
         clearInterval();
         closeStreams();
 
+        util.prune(outputFilesPath);
+        util.prune(workFilesPath);
+
         const outputFolderSize = util.sizeOfFolder(outputFilesPath);
         const workFolderSize = util.sizeOfFolder(workFilesPath);
 
@@ -246,6 +249,8 @@ space: ${outputFolderSize + workFolderSize} bytes
         if (!callbackCalled) {
             clearInterval();
             closeStreams();
+            util.prune(outputFilesPath);
+            util.prune(workFilesPath);
             callback(new Error("Timed-out"));
         }
     }, ttl);
