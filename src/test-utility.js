@@ -22,11 +22,19 @@ const runTest = (argv, callback) => {
     const fs = require("fs-extra");
     const util = require("./util");
 
+    // The default path to the parameters.json file, not necessary it exists
     let parametersFilePath = path.resolve("./parameters.json");
+
+    // The default path for the workFiles and output directories
     let outputPath = path.resolve(".");
+
+    // The full path to workFiles directory
     let workFilesPath = null;
+
+    // The full path to output directory
     let outputFilesPath = null;
 
+    // The default ttl, changes with size
     let ttl = 30000;
     // How long have we been running?
     let ellapsed = 0;
@@ -37,7 +45,23 @@ const runTest = (argv, callback) => {
     // Track the number of open write streams
     const streamArray = [];
 
+    // Flag to determine if the bee timed-out
     let callbackCalled = false;
+
+    // mail object to be written
+    const mailObject = {
+        mail: [],
+    };
+
+    // log object to be written
+    const logObject = {
+        logs: [],
+    };
+
+    // processing object to be written
+    const processingObject = {
+        params: [],
+    };
 
     const closeStreams = () => {
         streamArray.forEach((value) => {
@@ -53,22 +77,21 @@ const runTest = (argv, callback) => {
     };
 
     const createServices = (inputFilePath) => {
-        // TODO: Validation for fileName, what should happen if the user requests a writeStream for an 
+        // TODO: Validation for fileName, what should happen if the user requests a writeStream for an
         // already created fileName
         // Create the services object
         const services = {
             // Just log a message to the system console
             log: (message, type) => {
-                const chunk = `${Date.now()},${type},${message}\n`;
-                console.log(chunk);
+                logObject.logs.push({ date: Date.now(), type, message });
             },
             // email service to mock the sending of an email
-            mail: () => {
-                // TODO: What do in here? Log something? Do Nothing?
+            mail: (recipient, template, replacement) => {
+                mailObject.mail.push({ recipient, template, replacement });
             },
             getNextId,
             addParam: (key, value) => {
-                console.log(`${key} => ${value} added to the next bee`);
+                processingObject.params.push({ key, value });
             },
             timeToRun: () => ttl - ellapsed,
             // The default streams for reading and writing
@@ -219,6 +242,35 @@ const runTest = (argv, callback) => {
         }
     }
 
+    const outputXcoobeeObjects = () => {
+        if (logObject.logs.length > 0) {
+            fs.writeFileSync(path.join(outputFilesPath, "xcoobeelog.json"), JSON.stringify(logObject, null, 2));
+        }
+
+        if (mailObject.mail.length > 0) {
+            fs.writeFileSync(path.join(outputFilesPath, "xcoobeemail.json"), JSON.stringify(mailObject, null, 2));
+        }
+
+        if (processingObject.params.length > 0) {
+            fs.writeFileSync(path.join(outputFilesPath, "xcoobeeparam.json"), JSON.stringify(processingObject, null, 2));
+        }
+    };
+
+    setInterval(() => {
+        ellapsed += 2;
+    }, 2);
+
+    setTimeout(() => {
+        if (!callbackCalled) {
+            clearInterval();
+            closeStreams();
+            outputXcoobeeObjects();
+            util.prune(outputFilesPath);
+            util.prune(workFilesPath);
+            callback(new Error("Timed-out"));
+        }
+    }, ttl);
+
     const beeCallback = (err, result) => {
         callbackCalled = true;
         clearInterval();
@@ -226,6 +278,8 @@ const runTest = (argv, callback) => {
 
         util.prune(outputFilesPath);
         util.prune(workFilesPath);
+
+        outputXcoobeeObjects();
 
         const outputFolderSize = util.sizeOfFolder(outputFilesPath);
         const workFolderSize = util.sizeOfFolder(workFilesPath);
@@ -248,21 +302,6 @@ space: ${totalSize >= 536870912 ? chalk.red(totalSize + " bytes") : chalk.green(
 
         return callback(null, result);
     };
-
-    setTimeout(() => {
-        if (!callbackCalled) {
-            clearInterval();
-            closeStreams();
-            util.prune(outputFilesPath);
-            util.prune(workFilesPath);
-            callback(new Error("Timed-out"));
-        }
-    }, ttl);
-
-    setInterval(() => {
-        ellapsed += 2;
-    }, 2);
-
     beeModule.flight(services, data, beeCallback);
 };
 
