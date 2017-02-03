@@ -45,3 +45,6 @@ tmp
 
 #developer-local
 dev-env
+
+# Folder used to output files
+out/
