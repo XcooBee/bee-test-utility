@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const chalk = require("chalk");
+
 const runTest = (argv, callback) => {
     const path = require("path");
     const fs = require("fs-extra");
@@ -80,7 +82,7 @@ const runTest = (argv, callback) => {
                     ];
 
                     if (filesBlackList.indexOf(fileName.toLowerCase()) !== -1) {
-                        return callback(Error(`Attempted to use reserved file name ${fileName}`));
+                        return callback(Error(`Attempted to use reserved file name '${fileName}'`));
                     }
 
                     const typePath = type === "wip" ? "workFiles" : "output";
@@ -228,14 +230,16 @@ const runTest = (argv, callback) => {
         const outputFolderSize = util.sizeOfFolder(outputFilesPath);
         const workFolderSize = util.sizeOfFolder(workFilesPath);
 
+        const totalSize = outputFolderSize + workFolderSize;
+
         console.log(`
 ==========================================
 Bee test result completed
 ==========================================
 status: Success
 instance: ${size}
-time: ${ellapsed}ms
-space: ${outputFolderSize + workFolderSize} bytes
+time: ${chalk.green(ellapsed + " ms")}
+space: ${totalSize >= 536870912 ? chalk.red(totalSize + " bytes") : chalk.green(totalSize + " bytes")} 
         `);
 
         if (err) {
@@ -265,7 +269,13 @@ space: ${outputFolderSize + workFolderSize} bytes
 if (require.main === module) {
     const callback = (err, result) => {
         if (err) {
-            console.log(err.message);
+            console.log(`
+==========================================
+Bee test result completed
+==========================================
+status: ${chalk.red("Failure")}
+reason: ${err.message}
+        `);
             return process.exit(1);
         }
         return process.exit(0);
