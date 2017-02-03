@@ -17,10 +17,14 @@
  */
 const runTest = (argv, callback) => {
     const path = require("path");
-    const fs = require("fs");
+    const fs = require("fs-extra");
+    const util = require("./util");
 
     let parametersFilePath = path.resolve("./parameters.json");
     let outputPath = path.resolve(".");
+    let workFilesPath = null;
+    let outputFilesPath = null;
+
     let ttl = 30000;
     // How long have we been running?
     let ellapsed = 0;
@@ -70,6 +74,15 @@ const runTest = (argv, callback) => {
             // TODO: Should overwrite the files
             writeStreamManager: () => ({
                 getWriteStream: (fileName, type) => {
+                    const filesBlackList = ["xcoobeemail.json",
+                        "xcoobeelog.json",
+                        "xcoobeeparam.json",
+                    ];
+
+                    if (filesBlackList.indexOf(fileName.toLowerCase()) !== -1) {
+                        return callback(Error(`Attempted to use reserved file name ${fileName}`));
+                    }
+
                     const typePath = type === "wip" ? "workFiles" : "output";
                     const stream = fs.createWriteStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
                     streamArray.push(stream);
@@ -85,6 +98,8 @@ const runTest = (argv, callback) => {
 
         return services;
     };
+
+    const overWriteFiles = argv.indexOf("-o") !== -1;
 
     // Assume we are on the node project directory
     // unless otherwise specified by the --bee switch
@@ -105,9 +120,10 @@ const runTest = (argv, callback) => {
     // Set the size instance in which this bee will be run
     // We use the size to, among other things, choose the proper ttl
     const sizeIndex = argv.indexOf("--size");
+    let size = "s";
     if (sizeIndex !== -1) {
         const validSizes = ["s", "m", "l"];
-        const size = argv[sizeIndex + 1].toLowerCase();
+        size = argv[sizeIndex + 1].toLowerCase();
 
         if (validSizes.indexOf(size) === -1) {
             callback(new Error(`'${size}' is not a valid size, must be one of [s, m, l]`));
@@ -155,12 +171,20 @@ const runTest = (argv, callback) => {
         }
     }
 
-    if (!fs.existsSync(`${outputPath}${path.sep}output`)) {
-        fs.mkdirSync(`${outputPath}${path.sep}output`);
+    // Be extremely careful to not delete a sensitive folder
+    outputFilesPath = `${outputPath}${path.sep}output`;
+    workFilesPath = `${outputPath}${path.sep}workFiles`;
+
+    if (!fs.existsSync(outputFilesPath)) {
+        fs.mkdirSync(outputFilesPath);
+    } else if (overWriteFiles) {
+        fs.emptyDirSync(outputFilesPath);
     }
 
-    if (!fs.existsSync(`${outputPath}${path.sep}workFiles`)) {
-        fs.mkdirSync(`${outputPath}${path.sep}workFiles`);
+    if (!fs.existsSync(workFilesPath)) {
+        fs.mkdirSync(workFilesPath);
+    } else if (overWriteFiles) {
+        fs.emptyDirSync(workFilesPath);
     }
 
     // The input file must be the first argument
@@ -193,12 +217,24 @@ const runTest = (argv, callback) => {
         }
     }
 
-
     const beeCallback = (err, result) => {
         callbackCalled = true;
         clearInterval();
-        console.log(`Total exec time: ${ellapsed} millis`);
         closeStreams();
+
+        const outputFolderSize = util.sizeOfFolder(outputFilesPath);
+        const workFolderSize = util.sizeOfFolder(workFilesPath);
+
+        console.log(`
+==========================================
+Bee test result completed
+==========================================
+status: Success
+instance: ${size}
+time: ${ellapsed}ms
+space: ${outputFolderSize + workFolderSize} bytes
+        `);
+
         if (err) {
             return callback(err);
         }
@@ -227,7 +263,6 @@ if (require.main === module) {
             console.log(err.message);
             return process.exit(1);
         }
-        console.log(result);
         return process.exit(0);
     };
     runTest(process.argv, callback);
