@@ -118,6 +118,10 @@ It is used as a tool to write and test bees and mimicks the behavior of the Xcoo
 ### Command args
 The utility takes a variety of switches that customize the way the bee is run.
 
+#### -o flag
+This switch tells the utility to overwrite any file or folder in the workFiles and output directory. If the flag is set the utility will remove
+any existent file inside the workFiles and output folder before running.
+
 #### <a id="params"></a>--params <bee-parameters-filepath>
 The parameters file mimicks the `data` argument of your `flight()` function. You can change it to test different conditions.
 The test utility will use <bee-parameters-filepath> as the parameter file. The referenced file must be a valid JSON file and might contain
@@ -156,6 +160,10 @@ four main nodes:
 ```npm run flight input.png -- -size m```
 
 *NOTICE* You need to put the '--' (without the quotes) before passing any switch to the script
+
+* Call with -o flag, deleting any file inside the workFiles and output folders before executing
+
+```npm run flight input.png -- -o --out /path/to/output```
 
 #### Sample parameters file
 ```
