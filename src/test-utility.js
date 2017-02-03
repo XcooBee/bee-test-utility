@@ -285,7 +285,7 @@ const runTest = (argv, callback) => {
         const workFolderSize = util.sizeOfFolder(workFilesPath);
 
         const totalSize = outputFolderSize + workFolderSize;
-
+        const issueWarning = totalSize >= 536870912;
         console.log(`
 ==========================================
 Bee test result completed
@@ -293,7 +293,7 @@ Bee test result completed
 status: Success
 instance: ${size}
 time: ${chalk.green(ellapsed + " ms")}
-space: ${totalSize >= 536870912 ? chalk.red(totalSize + " bytes") : chalk.green(totalSize + " bytes")} 
+space: ${issueWarning ? chalk.red(totalSize + " bytes") : chalk.green(totalSize + " bytes")} ${issueWarning ? "--->WARNING" : ""}
         `);
 
         if (err) {
