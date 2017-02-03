@@ -124,6 +124,25 @@ const runTest = (argv, callback) => {
         return services;
     };
 
+    const showHelp = argv.indexOf("--help") !== -1;
+    if (showHelp) {
+        const marked = require("marked");
+        const TerminalRenderer = require("marked-terminal");
+        marked.setOptions({
+            renderer: new TerminalRenderer(),
+            gfm: true,
+            tables: true,
+            breaks: false,
+            pedantic: false,
+            sanitize: false,
+            smartLists: true,
+            smartypants: false,
+        });
+        const helpText = fs.readFileSync("./src/assets/help.md");
+        console.log(marked(helpText.toString("utf8")));
+        return callback();
+    }
+
     const overWriteFiles = argv.indexOf("-o") !== -1;
 
     // Assume we are on the node project directory
