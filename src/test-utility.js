@@ -97,7 +97,7 @@ const runTest = (argv, callback) => {
             // The default streams for reading and writing
             readStream: fs.createReadStream(inputFilePath),
             // TODO: Should overwrite the files
-            writeStreamManager: () => ({
+            writeStreamManager: {
                 getWriteStream: (fileName, type) => {
                     const filesBlackList = ["xcoobeemail.json",
                         "xcoobeelog.json",
@@ -118,7 +118,7 @@ const runTest = (argv, callback) => {
                     const stream = fs.createReadStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
                     return stream;
                 },
-            }),
+            },
         };
 
         return services;
