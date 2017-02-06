@@ -80,6 +80,7 @@ const runTest = (argv, callback) => {
         // TODO: Validation for fileName, what should happen if the user requests a writeStream for an
         // already created fileName
         // Create the services object
+        const readStream = fs.createReadStream(inputFilePath);
         const services = {
             // Just log a message to the system console
             log: (message, type) => {
@@ -95,7 +96,7 @@ const runTest = (argv, callback) => {
             },
             timeToRun: () => ttl - ellapsed,
             // The default streams for reading and writing
-            readStream: fs.createReadStream(inputFilePath),
+            readStream: () => readStream,
             // TODO: Should overwrite the files
             writeStreamManager: {
                 getWriteStream: (fileName, type) => {
