@@ -49,19 +49,13 @@ const runTest = (argv, callback) => {
     let callbackCalled = false;
 
     // mail object to be written
-    const mailObject = {
-        mail: [],
-    };
+    const mailObject = [];
 
     // log object to be written
-    const logObject = {
-        logs: [],
-    };
+    const logObject = [];
 
     // processing object to be written
-    const processingObject = {
-        params: [],
-    };
+    const processingObject = [];
 
     const closeStreams = () => {
         streamArray.forEach((value) => {
@@ -76,6 +70,9 @@ const runTest = (argv, callback) => {
         return current;
     };
 
+    // The number of requested streams in the output folder
+    let requestedStreamsInOutput = 0;
+
     const createServices = (inputFilePath) => {
         // TODO: Validation for fileName, what should happen if the user requests a writeStream for an
         // already created fileName
@@ -84,15 +81,15 @@ const runTest = (argv, callback) => {
         const services = {
             // Just log a message to the system console
             log: (message, type) => {
-                logObject.logs.push({ date: Date.now(), type, message });
+                logObject.push({ date: Date.now(), type, message });
             },
             // email service to mock the sending of an email
             mail: (recipient, template, replacement) => {
-                mailObject.mail.push({ recipient, template, replacement });
+                mailObject.push({ recipient, template, replacement });
             },
             getNextId,
             addParam: (key, value) => {
-                processingObject.params.push({ key, value });
+                processingObject.push({ key, value });
             },
             timeToRun: () => ttl - ellapsed,
             // The default streams for reading and writing
@@ -100,13 +97,18 @@ const runTest = (argv, callback) => {
             // TODO: Should overwrite the files
             writeStreamManager: {
                 getWriteStream: (fileName, type) => {
-                    const filesBlackList = ["xcoobeemail.json",
+                    const filesBlackList = [
+                        "xcoobeemail.json",
                         "xcoobeelog.json",
                         "xcoobeeparam.json",
                     ];
 
                     if (filesBlackList.indexOf(fileName.toLowerCase()) !== -1) {
                         return callback(Error(`Attempted to use reserved file name '${fileName}'`));
+                    }
+
+                    if (type === "output") {
+                        requestedStreamsInOutput += 1;
                     }
 
                     const typePath = type === "wip" ? "workFiles" : "output";
@@ -149,10 +151,11 @@ const runTest = (argv, callback) => {
     // Assume we are on the node project directory
     // unless otherwise specified by the --bee switch
     let beeModule = null;
+    let pathToBee;
     try {
         const beeIndex = argv.indexOf("--bee");
         if (beeIndex !== -1) {
-            const pathToBee = path.resolve(argv[beeIndex + 1]);
+            pathToBee = path.resolve(argv[beeIndex + 1]);
             beeModule = require(pathToBee);
         } else {
             // TODO: Don't rely on cwd
@@ -263,15 +266,15 @@ const runTest = (argv, callback) => {
     }
 
     const outputXcoobeeObjects = () => {
-        if (logObject.logs.length > 0) {
+        if (logObject.length > 0) {
             fs.writeFileSync(path.join(outputFilesPath, "xcoobeelog.json"), JSON.stringify(logObject, null, 2));
         }
 
-        if (mailObject.mail.length > 0) {
+        if (mailObject.length > 0) {
             fs.writeFileSync(path.join(outputFilesPath, "xcoobeemail.json"), JSON.stringify(mailObject, null, 2));
         }
 
-        if (processingObject.params.length > 0) {
+        if (processingObject.length > 0) {
             fs.writeFileSync(path.join(outputFilesPath, "xcoobeeparam.json"), JSON.stringify(processingObject, null, 2));
         }
     };
@@ -305,16 +308,20 @@ const runTest = (argv, callback) => {
         const workFolderSize = util.sizeOfFolder(workFilesPath);
 
         const totalSize = outputFolderSize + workFolderSize;
-        const issueWarning = totalSize >= 536870912;
+        const issueSizeWarning = totalSize >= 536870912;
         console.log(`
 ==========================================
 Bee test result completed
 ==========================================
 status: Success
 instance: ${size}
-time: ${chalk.green(ellapsed + " ms")}
-space: ${issueWarning ? chalk.red(totalSize + " bytes") : chalk.green(totalSize + " bytes")} ${issueWarning ? "--->WARNING" : ""}
+time: ${chalk.green(ellapsed)}ms
+space: ${issueSizeWarning ? chalk.red(totalSize) : chalk.green(totalSize)} bytes ${issueSizeWarning ? "--->WARNING" : ""}
         `);
+
+        if (requestedStreamsInOutput > 1) {
+            console.log(chalk.yellow(`*More than one write stream requested in module ${pathToBee}, make sure to mark it as splitter.`));
+        }
 
         if (err) {
             return callback(err);
