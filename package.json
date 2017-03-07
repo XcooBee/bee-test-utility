@@ -4,6 +4,7 @@
   "description": "The utility used to test bees that will be published in XcooBee network",
   "main": "index.js",
   "scripts": {
+    "flight" : "node src/test-utility.js",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec"
   },
   "repository": {
