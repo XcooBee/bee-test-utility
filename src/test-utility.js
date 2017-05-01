@@ -207,15 +207,14 @@ const runTest = (argv, callback) => {
     if (outputIndex !== -1) {
         outputPath = path.resolve(argv[outputIndex + 1]);
 
-        // TODO: A way to create the hierarchy
-        if (!fs.existsSync(outputPath)) {
-            callback(new Error(`${outputPath} is not a valid directory`));
-        }
+        try {
+            const stats = fs.lstatSync(outputPath);
 
-        const stats = fs.lstatSync(outputPath);
-
-        if (!stats.isDirectory()) {
-            callback(new Error(`${outputPath} is not a valid directory`));
+            if (!stats.isDirectory()) {
+                callback(new Error(`${outputPath} is not a valid directory`));
+            }
+        } catch (err) {
+            callback(new Error(`${outputPath} is unknown`));
         }
     }
 

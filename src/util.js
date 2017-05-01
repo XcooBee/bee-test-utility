@@ -17,12 +17,16 @@ const sizeOfFolder = (pathToFolder) => {
 
         list.forEach((value) => {
             const itemAbsolutePath = path.join(_pathToFolder, value);
-            const itemStats = fs.lstatSync(itemAbsolutePath);
+            try {
+                const itemStats = fs.lstatSync(itemAbsolutePath);
 
-            if (itemStats.isDirectory()) {
-                total += sizeOfFolder(itemAbsolutePath);
-            } else {
-                total += itemStats.size;
+                if (itemStats.isDirectory()) {
+                    total += sizeOfFolder(itemAbsolutePath);
+                } else {
+                    total += itemStats.size;
+                }
+            } catch (err) {
+                console.log("no such file or folder - it may have been removed (1):", itemAbsolutePath);
             }
         });
 
@@ -42,14 +46,18 @@ const prune = (pathToFolder) => {
 
         list.forEach((value) => {
             const itemAbsolutePath = path.join(_pathToFolder, value);
-            const itemStats = fs.lstatSync(itemAbsolutePath);
+            try {
+                const itemStats = fs.lstatSync(itemAbsolutePath);
 
-            if (!itemStats.isDirectory()) {
-                const size = itemStats.size;
+                if (!itemStats.isDirectory()) {
+                    const size = itemStats.size;
 
-                if (size === 0) {
-                    fs.unlinkSync(itemAbsolutePath);
+                    if (size === 0) {
+                        fs.unlinkSync(itemAbsolutePath);
+                    }
                 }
+            } catch (err) {
+                console.log("No such file or dir - it may have been removed (2):", itemAbsolutePath);
             }
         });
     }
