@@ -169,7 +169,10 @@ four main nodes:
 ```
 {
     "integrations" : {
-        "facebook": "my-facebook-authtoken"
+        "facebook": {            
+            "access_token": "valid access token",            
+            "user_name": "test user"
+        }
     },
     "bee_params": {
         "favoriteColor": "green",
