@@ -60,7 +60,7 @@ callback("problem occured with file",null);
 ```
 
 ## Services
-Each bee when invoked will be passed a collection of services and a colleciton of data to conduct its operations.
+Each bee when invoked will be passed a collection of services and a colleciton of data to conduct its operations. This is passed as **services** argument during the flight() function invocation.
 
 ### log(message, type)
 You can use the log to create trace entries for your processing. Use this service to write file processing related feedback.
@@ -100,6 +100,25 @@ Sequence generator. Will return next available integer.
 You can attempt to send email to user. To do so you will need to know the XcooBee mail template reference and replacement values.
 More details for this in the future. 
 
+## The data object
+When your bee is invoked a certain set of data is made available to it via the `data` argument in your function definition [flight(services, **data**, callback)]. This allows basic information to flow to the bee for processing and it has several subkeys. All subkeys are optional.
+
+The subkeys are: integrations, user_data, parameters, flightprocessing, and env
+
+### integrations
+If the bee requires access tokens from the XcooBee platform and the user has authorized it, the XcooBee platform will populate this node with specific information needed for each integration. The structure of object will depend on the integration accessed.
+
+### user_data
+Basic data about the user such as name and XcooBeeId. This will also contain the user's external reference passed in via `userReference` element of the bee-directive file.
+
+### parameters
+The processing parameters that were provided by the user during the hiring process of the bee and written in to the bee-directive file.
+
+### flightprocessing
+This is a communication object shared by all bees. Bees can add data using the `addParam(key, value)` service. Bees can read all data saved by previous bees (for multi-step processing). They can write new data. The can only override their own data (data that this bee has written).
+
+### env
+This node contains basic environment information such as the path to work files and output files. This can be used by programs to directly place files into them. However, this is not recommend practice. 
 
 ## Module Construction
 When you write a bee a minimal set of rules should be followed.
@@ -129,15 +148,15 @@ four main nodes:
 - integrations
     A JSON object that represents the app integrations the bee will need, it will be passed to the bee in the data.integrations object.
 
-- bee_params
+- parameters
     A JSON object that represents the named parameters the bee will use, it will be passed to the bee in the data.parameters object.
-    By default we will look for a file named `parameters.json` in the same directory. If this file is not there then the the test utility will pass an empty parameters container to the code for execution.
+    By default we will look for a file named `parameters.json` in the same directory. If this file is not there then the the test utility will pass an empty parameters container to the code for execution. The objects will be made available to the bee as `data.parameters` argument in the function call.
 
 - flightprocessing
     This is the state container for the flightpath. When you use the `services.addParam()` method, a paramater pair (key, value) will be added to this object and included for downstream processing. Later bees can read the message placed here and include in their processing. This is the way to communicate between bees as the flightpath is flown. Your parameters will also be assigned a prefix based on the system name of your bee.
 
 - user_data
-    this object contains basic data about the user hiring the bee
+    This object contains basic data about the user hiring the bee. The user_data will be made available via the `data.user_data` argument of the function call.
     
 #### usage examples
 * Minimum call, 'input.png' located in the current directory:
@@ -174,7 +193,7 @@ four main nodes:
             "user_name": "test user"
         }
     },
-    "bee_params": {
+    "parameters": {
         "favoriteColor": "green",
         "age": 27
     },

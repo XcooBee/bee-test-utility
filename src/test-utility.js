@@ -258,7 +258,7 @@ const runTest = (argv, callback) => {
         try {
             parametersContent = JSON.parse(fs.readFileSync(parametersFilePath, "utf8"));
             data.integrations = parametersContent.integrations;
-            data.parameters = parametersContent.bee_params;
+            data.parameters = parametersContent.parameters;
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
         }
