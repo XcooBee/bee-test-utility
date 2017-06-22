@@ -243,13 +243,13 @@ const runTest = (argv, callback) => {
 
     const services = createServices(inputFilePath);
 
-    const data = {
-        // Mock data just for testing purposes
-        user_data: {
-            first_name: "John",
-            last_name: "Testerson",
-            xcoobee_id: "~johnt",
-        },
+    const data = {};
+
+    const defaultUserData =  {
+        first_name: "John",
+        last_name: "Testerson",
+        xcoobee_id: "~johnt",
+        locale: "en-us"
     };
 
     let parametersContent = null;
@@ -260,6 +260,7 @@ const runTest = (argv, callback) => {
             data.integrations = parametersContent.integrations;
             data.parameters = parametersContent.parameters;
             data.flightprocessing = parametersContent.flightprocessing;
+            data.user_data = parametersContent.user_data || defaultUserData;
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
         }
