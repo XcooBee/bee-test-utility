@@ -3,6 +3,28 @@
 This is a simple *bee* template, it includes the files needed to test and publish your bees.
 We also use this as an example to describe the bee life cycle and code expectations.
 
+## Installation
+
+Please install the bee tester using the standard npm install from git command inside the bee you are developing.
+If you are using github + ssh authentication it is:
+`npm install git+git@github.com:XcooBee/bee-test-utility.git --save-dev`
+
+or 
+
+If you are using github with https security:
+`npm install https://github.com/XcooBee/bee-test-utility.git --save-dev`
+
+We will add this repo to npm soon and update the instructions.
+
+The final step is to add a `flight` directive to your scripts section of your `package.json`
+
+```
+  "scripts": {
+    "flight": "node node_modules/bee-test-utility/src/test-utility.js"
+    ...
+  },
+```
+
 ## The Bee Lifecycle
 
 Your code in essence will act as an independent node module (agent or plugin) which we at XcooBee refer to as bee.
