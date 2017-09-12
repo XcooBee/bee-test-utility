@@ -1,6 +1,6 @@
-# test-bee-simple
+# Bee Test Utility
 ## Description
-This is a simple *bee* template, it includes the files needed to test and publish your bees.
+This is a simple *bee* tester, it includes the files needed to test and publish your bees.
 We also use this as an example to describe the bee life cycle and code expectations.
 
 ## Installation
