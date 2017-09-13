@@ -5,16 +5,17 @@ We also use this as an example to describe the bee life cycle and code expectati
 
 ## Installation
 
-Please install the bee tester using the standard npm install from git command inside the bee you are developing.
-If you are using github + ssh authentication it is:
-`npm install git+git@github.com:XcooBee/bee-test-utility.git --save-dev`
+You can install from npm via:
+
+`npm install xcoobee-bee-test-utility --save-dev`
 
 or 
 
-If you are using github with https security:
-`npm install https://github.com/XcooBee/bee-test-utility.git --save-dev`
+If you want to use git directly, you can install the bee tester using the standard npm install from git command inside the bee you are developing.
 
-We will add this repo to npm soon and update the instructions.
+If you are using github + ssh authentication it is:
+`npm install git+git@github.com:XcooBee/bee-test-utility.git --save-dev`
+
 
 The final step is to add a `flight` directive to your scripts section of your `package.json`
 
