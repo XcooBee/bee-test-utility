@@ -16,7 +16,7 @@
     "bee"
   ],
   "author": "Bilal Soylu",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/XcooBee/bee-test-utility/issues"
   },
