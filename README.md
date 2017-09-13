@@ -21,7 +21,7 @@ The final step is to add a `flight` directive to your scripts section of your `p
 
 ```
   "scripts": {
-    "flight": "node node_modules/bee-test-utility/src/test-utility.js"
+    "flight": "node node_modules/xcoobee-bee-test-utility/src/test-utility.js"
     ...
   },
 ```
