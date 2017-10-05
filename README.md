@@ -121,7 +121,13 @@ Sequence generator. Will return next available integer.
 
 ### mail(template)
 You can attempt to send email to user. To do so you will need to know the XcooBee mail template reference and replacement values.
-More details for this in the future. 
+More details for this in the future.
+
+### getFileType(filename)
+Returns type for the file that is being processed
+
+### getFileTags(filename)
+Returns tags for the file that is being processed
 
 ## The data object
 When your bee is invoked a certain set of data is made available to it via the `data` argument in your function definition [flight(services, **data**, callback)]. This allows basic information to flow to the bee for processing and it has several subkeys. All subkeys are optional.

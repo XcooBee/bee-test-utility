@@ -122,6 +122,8 @@ const runTest = (argv, callback) => {
                     return stream;
                 },
             },
+            getFileType: filename => 999,
+            getFileTags: filename => ["one", "two", "three"],
         };
 
         return services;
