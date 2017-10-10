@@ -161,7 +161,7 @@ The bee includes the **test-utility** under the **flight** npm script.
 It is used as a tool to write and test bees and mimicks the behavior of the XcooBee infrasctructure.
 
 ### Usage
-`npm run flight <input-filepath> -- [--params <bee-parameters-filepath>]? [--out <output-dir-path>]? [--size [s|m|l]]?`
+`npm run flight <input-filepath> -- [--params <bee-parameters-filepath>]? [--out <output-dir-path>]? [--size [s|m|l]]? [--info <files-info-filepath>]?`
 
 ### Command args
 The utility takes a variety of switches that customize the way the bee is run.
@@ -201,11 +201,15 @@ four main nodes:
 
 * Call specifying the JSON file to be used as parameters for the bee (See [parameters](#params))
 
-```npm run flight input.png -- -params /path/to/parameters.json```
+```npm run flight input.png -- --params /path/to/parameters.json```
 
 * Call specifying the size of the instance to mimick (See [execution](#exec))
 
-```npm run flight input.png -- -size m```
+```npm run flight input.png -- --size m```
+
+* Call specifying the JSON file that contains additional information about input files
+
+```npm run flight input.png -- --info /path/to/info.json```
 
 *NOTICE* You need to put the '--' (without the quotes) before passing any switch to the script
 
@@ -255,6 +259,21 @@ The default is the current directory of program.
 This switch, among other things, determines the resource envelope available to the bee. 
 The test utility will provide some information when you finish whether you have execeeded limits.
 The default size is `m`
+
+### --info <files-info-filepath>
+Path to JSON file that contains additional information about files that are being processed, e.g. file type, file tags etc.
+This data can be accessed inside bee using appropriate service.
+
+#### Sample information file
+```
+{
+    "image.jpg" : {
+        "file_type": 1015,
+        "file_tags": ["awesome image"]
+    }
+}
+```
+
 
 
 
