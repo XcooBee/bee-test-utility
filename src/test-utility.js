@@ -57,6 +57,12 @@ const runTest = (argv, callback) => {
     // processing object to be written
     const processingObject = [];
 
+    // contains information about input files
+    let filesInfo = {};
+    
+    // path to info file
+    let infoFilePath = null;
+
     const closeStreams = () => {
         streamArray.forEach((value) => {
             value.close();
@@ -122,6 +128,8 @@ const runTest = (argv, callback) => {
                     return stream;
                 },
             },
+            getFileType: filename => (filesInfo[filename] && filesInfo[filename].file_type) || 999,
+            getFileTags: filename => (filesInfo[filename] && filesInfo[filename].file_tags) || ["one", "two", "three"],
         };
 
         return services;
@@ -201,6 +209,16 @@ const runTest = (argv, callback) => {
         }
     }
 
+    // receive additional information about files
+    const infoIndex = argv.indexOf("--info");
+    if (infoIndex !== -1) {
+        infoFilePath = path.resolve(argv[infoIndex + 1]);
+
+        if (!fs.existsSync(infoFilePath)) {
+            callback(Error(`${infoFilePath} doesn't exist`));
+        }
+    }
+
     // If the user specifies the output as a directory, use a default file name 'output' with no extension
     // The output directory must exists, the utility WON'T create it
     const outputIndex = argv.indexOf("--out");
@@ -263,6 +281,14 @@ const runTest = (argv, callback) => {
             data.user_data = parametersContent.user_data || defaultUserData;
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
+        }
+    }
+
+    if (infoFilePath && fs.existsSync(infoFilePath)) {
+        try {
+            filesInfo = JSON.parse(fs.readFileSync(infoFilePath, "utf8"));
+        } catch (err) {
+            callback(new Error(`${infoFilePath} is not a valid JSON file`));
         }
     }
 
