@@ -130,6 +130,7 @@ const runTest = (argv, callback) => {
             },
             getFileType: filename => (filesInfo[filename] && filesInfo[filename].file_type) || 999,
             getFileTags: filename => (filesInfo[filename] && filesInfo[filename].file_tags) || ["one", "two", "three"],
+            validationError: field => services.log(`Input value for '${field}' is not correct`, "error"),
         };
 
         return services;
