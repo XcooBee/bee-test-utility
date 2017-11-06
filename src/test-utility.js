@@ -86,8 +86,8 @@ const runTest = (argv, callback) => {
         const readStream = fs.createReadStream(inputFilePath);
         const services = {
             // Just log a message to the system console
-            log: (message, type) => {
-                logObject.push({ date: Date.now(), type, message });
+            log: (message, type, replacement = {}) => {
+                logObject.push({ date: Date.now(), type, message, replacement });
             },
             // email service to mock the sending of an email
             mail: (recipient, template, replacement) => {

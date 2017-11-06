@@ -85,11 +85,12 @@ callback("problem occured with file",null);
 ## Services
 Each bee when invoked will be passed a collection of services and a colleciton of data to conduct its operations. This is passed as **services** argument during the flight() function invocation.
 
-### log(message, type)
+### log(message, type, replacement)
 You can use the log to create trace entries for your processing. Use this service to write file processing related feedback.
 This is generally not displayed to the end-user but available to XcooBee support.
 where message = string: the message to be logged
 where type = enum one of (info|warning|error)
+where replacement = object: values for variables used in message, optional parameter
 
 
 ### writeStream()
@@ -119,7 +120,7 @@ add data to parameter structure to be provided to next bee (changes the directiv
 ### getNextId()
 Sequence generator. Will return next available integer.
 
-### mail(template)
+### mail(recipient, template, replacement)
 You can attempt to send email to user. To do so you will need to know the XcooBee mail template reference and replacement values.
 More details for this in the future.
 
