@@ -63,6 +63,9 @@ const runTest = (argv, callback) => {
     // path to info file
     let infoFilePath = null;
 
+    // bee system params
+    let beeSystemParams = {};
+
     const closeStreams = () => {
         streamArray.forEach((value) => {
             value.close();
@@ -131,6 +134,8 @@ const runTest = (argv, callback) => {
             getFileType: filename => (filesInfo[filename] && filesInfo[filename].file_type) || 999,
             getFileTags: filename => (filesInfo[filename] && filesInfo[filename].file_tags) || ["one", "two", "three"],
             validationError: field => services.log(`Input value for '${field}' is not correct`, "error"),
+            setBalanceLock: params => true,
+            getBeeParam: param => beeSystemParams[param],
         };
 
         return services;
@@ -280,6 +285,8 @@ const runTest = (argv, callback) => {
             data.parameters = parametersContent.parameters;
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
+            data.transaction_key = parametersContent.transaction_key;
+            beeSystemParams = parametersContent.bee_system_params || {};
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
         }

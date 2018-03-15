@@ -133,6 +133,12 @@ Returns tags for the file that is being processed
 ### validationError(field)
 Logs i18n compliant message about input validation error
 
+### setBalanceLock(params)
+Sets lock for required amount of points
+
+### getBeeParam(param)
+Returns bee's system param
+
 ## The data object
 When your bee is invoked a certain set of data is made available to it via the `data` argument in your function definition [flight(services, **data**, callback)]. This allows basic information to flow to the bee for processing and it has several subkeys. All subkeys are optional.
 
@@ -246,6 +252,10 @@ four main nodes:
         "crunchbee": {
             "color": "yellow"
         }
+    },
+    "transaction_key": "transaction_id",
+    "bee_system_params": {
+        "important_param": 10
     }    
 }
 ```
