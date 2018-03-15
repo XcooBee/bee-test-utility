@@ -57,6 +57,15 @@ const runTest = (argv, callback) => {
     // processing object to be written
     const processingObject = [];
 
+    // contains information about input files
+    let filesInfo = {};
+    
+    // path to info file
+    let infoFilePath = null;
+
+    // bee system params
+    let beeSystemParams = {};
+
     const closeStreams = () => {
         streamArray.forEach((value) => {
             value.close();
@@ -80,8 +89,8 @@ const runTest = (argv, callback) => {
         const readStream = fs.createReadStream(inputFilePath);
         const services = {
             // Just log a message to the system console
-            log: (message, type) => {
-                logObject.push({ date: Date.now(), type, message });
+            log: (message, type, replacement = {}) => {
+                logObject.push({ date: Date.now(), type, message, replacement });
             },
             // email service to mock the sending of an email
             mail: (recipient, template, replacement) => {
@@ -122,6 +131,11 @@ const runTest = (argv, callback) => {
                     return stream;
                 },
             },
+            getFileType: filename => (filesInfo[filename] && filesInfo[filename].file_type) || 999,
+            getFileTags: filename => (filesInfo[filename] && filesInfo[filename].file_tags) || ["one", "two", "three"],
+            validationError: field => services.log(`Input value for '${field}' is not correct`, "error"),
+            setBalanceLock: params => true,
+            getBeeParam: param => beeSystemParams[param],
         };
 
         return services;
@@ -201,6 +215,16 @@ const runTest = (argv, callback) => {
         }
     }
 
+    // receive additional information about files
+    const infoIndex = argv.indexOf("--info");
+    if (infoIndex !== -1) {
+        infoFilePath = path.resolve(argv[infoIndex + 1]);
+
+        if (!fs.existsSync(infoFilePath)) {
+            callback(Error(`${infoFilePath} doesn't exist`));
+        }
+    }
+
     // If the user specifies the output as a directory, use a default file name 'output' with no extension
     // The output directory must exists, the utility WON'T create it
     const outputIndex = argv.indexOf("--out");
@@ -261,8 +285,18 @@ const runTest = (argv, callback) => {
             data.parameters = parametersContent.parameters;
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
+            data.transaction_key = parametersContent.transaction_key;
+            beeSystemParams = parametersContent.bee_system_params || {};
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
+        }
+    }
+
+    if (infoFilePath && fs.existsSync(infoFilePath)) {
+        try {
+            filesInfo = JSON.parse(fs.readFileSync(infoFilePath, "utf8"));
+        } catch (err) {
+            callback(new Error(`${infoFilePath} is not a valid JSON file`));
         }
     }
 

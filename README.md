@@ -85,11 +85,12 @@ callback("problem occured with file",null);
 ## Services
 Each bee when invoked will be passed a collection of services and a colleciton of data to conduct its operations. This is passed as **services** argument during the flight() function invocation.
 
-### log(message, type)
+### log(message, type, replacement)
 You can use the log to create trace entries for your processing. Use this service to write file processing related feedback.
 This is generally not displayed to the end-user but available to XcooBee support.
 where message = string: the message to be logged
 where type = enum one of (info|warning|error)
+where replacement = object: values for variables used in message, optional parameter
 
 
 ### writeStream()
@@ -119,9 +120,24 @@ add data to parameter structure to be provided to next bee (changes the directiv
 ### getNextId()
 Sequence generator. Will return next available integer.
 
-### mail(template)
+### mail(recipient, template, replacement)
 You can attempt to send email to user. To do so you will need to know the XcooBee mail template reference and replacement values.
-More details for this in the future. 
+More details for this in the future.
+
+### getFileType(filename)
+Returns type for the file that is being processed
+
+### getFileTags(filename)
+Returns tags for the file that is being processed
+
+### validationError(field)
+Logs i18n compliant message about input validation error
+
+### setBalanceLock(params)
+Sets lock for required amount of points
+
+### getBeeParam(param)
+Returns bee's system param
 
 ## The data object
 When your bee is invoked a certain set of data is made available to it via the `data` argument in your function definition [flight(services, **data**, callback)]. This allows basic information to flow to the bee for processing and it has several subkeys. All subkeys are optional.
@@ -155,7 +171,7 @@ The bee includes the **test-utility** under the **flight** npm script.
 It is used as a tool to write and test bees and mimicks the behavior of the XcooBee infrasctructure.
 
 ### Usage
-`npm run flight <input-filepath> -- [--params <bee-parameters-filepath>]? [--out <output-dir-path>]? [--size [s|m|l]]?`
+`npm run flight <input-filepath> -- [--params <bee-parameters-filepath>]? [--out <output-dir-path>]? [--size [s|m|l]]? [--info <files-info-filepath>]?`
 
 ### Command args
 The utility takes a variety of switches that customize the way the bee is run.
@@ -195,11 +211,15 @@ four main nodes:
 
 * Call specifying the JSON file to be used as parameters for the bee (See [parameters](#params))
 
-```npm run flight input.png -- -params /path/to/parameters.json```
+```npm run flight input.png -- --params /path/to/parameters.json```
 
 * Call specifying the size of the instance to mimick (See [execution](#exec))
 
-```npm run flight input.png -- -size m```
+```npm run flight input.png -- --size m```
+
+* Call specifying the JSON file that contains additional information about input files
+
+```npm run flight input.png -- --info /path/to/info.json```
 
 *NOTICE* You need to put the '--' (without the quotes) before passing any switch to the script
 
@@ -232,6 +252,10 @@ four main nodes:
         "crunchbee": {
             "color": "yellow"
         }
+    },
+    "transaction_key": "transaction_id",
+    "bee_system_params": {
+        "important_param": 10
     }    
 }
 ```
@@ -249,6 +273,21 @@ The default is the current directory of program.
 This switch, among other things, determines the resource envelope available to the bee. 
 The test utility will provide some information when you finish whether you have execeeded limits.
 The default size is `m`
+
+### --info <files-info-filepath>
+Path to JSON file that contains additional information about files that are being processed, e.g. file type, file tags etc.
+This data can be accessed inside bee using appropriate service.
+
+#### Sample information file
+```
+{
+    "image.jpg" : {
+        "file_type": 1015,
+        "file_tags": ["awesome image"]
+    }
+}
+```
+
 
 
 
