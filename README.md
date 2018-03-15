@@ -252,6 +252,10 @@ four main nodes:
         "crunchbee": {
             "color": "yellow"
         }
+    },
+    "transaction_key": "transaction_id",
+    "bee_system_params": {
+        "important_param": 10
     }    
 }
 ```
