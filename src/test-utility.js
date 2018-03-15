@@ -64,10 +64,7 @@ const runTest = (argv, callback) => {
     let infoFilePath = null;
 
     // bee system params
-    const beeSystemParams = {
-        cost_per_email: 4,
-        cost_per_xcoobee_id: 2,
-    };
+    let beeSystemParams = {};
 
     const closeStreams = () => {
         streamArray.forEach((value) => {
@@ -288,6 +285,8 @@ const runTest = (argv, callback) => {
             data.parameters = parametersContent.parameters;
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
+            data.transaction_key = parametersContent.transaction_key;
+            beeSystemParams = parametersContent.bee_system_params;
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
         }
