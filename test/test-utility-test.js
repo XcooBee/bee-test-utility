@@ -109,7 +109,7 @@ describe("Testing test-utility", () => {
         };
 
         const utility = proxyquire("../src/test-utility", stubs);
-        const callback = (err, result) => {
+        const callback = (err) => {
             try {
                 assert.equal(err.message, "Timed-out");
                 done();
