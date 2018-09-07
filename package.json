@@ -22,9 +22,9 @@
   },
   "homepage": "https://github.com/XcooBee/bee-test-utility#readme",
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb-base": "^11.0.0",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.11",
