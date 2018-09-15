@@ -5,7 +5,15 @@ const path = require("path");
 const sinon = require("sinon");
 const assert = require("assert");
 
+
+const sandbox = sinon.createSandbox();
+
 describe("Testing test-utility", () => {
+
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Should return proper ids when getNextId service is called", (done) => {
         const argv = [
             "",
@@ -17,8 +25,8 @@ describe("Testing test-utility", () => {
         const beeKey = path.resolve(argv[4]);
 
         const fs = require("fs");
-        const createWriteStreamSpy = sinon.stub(fs, "createWriteStream", () => ({}));
-        const createReadStreamSpy = sinon.stub(fs, "createReadStream", () => ({}));
+        const createWriteStreamSpy = sandbox.stub(fs, "createWriteStream");
+        const createReadStreamSpy = sandbox.stub(fs, "createReadStream");
 
         const stubs = {
             fs,
@@ -52,11 +60,12 @@ describe("Testing test-utility", () => {
             "--bee",
             "./test/assets/bee_simple.js",
         ];
-        const beeKey = path.resolve(argv[4]);
 
-        const fs = require("fs");
-        const createWriteStreamSpy = sinon.spy(fs, "createWriteStream");
-        const createReadStreamSpy = sinon.spy(fs, "createReadStream");
+        const beeKey = path.resolve(argv[4]);
+        const fs = require("fs-extra");
+
+        const createWriteStreamSpy = sinon.stub(fs, "createWriteStream");
+        const createReadStreamSpy = sinon.stub(fs, "createReadStream");
 
         const stubs = {
             fs,
@@ -65,10 +74,10 @@ describe("Testing test-utility", () => {
         stubs[beeKey] = {
             flight: (services, data, callback) => {
                 const outputPath = path.resolve("./");
-                assert.ok(createReadStreamSpy.calledWith(path.resolve("./test/assets/input.txt")));
-                assert.ok(createWriteStreamSpy.calledWith(`${outputPath}${path.sep}output${path.sep}bee_default_output`));
-                createReadStreamSpy.restore();
-                createWriteStreamSpy.restore();
+                // createWriteStreamSpy.restore();
+                // createReadStreamSpy.restore();
+                sinon.assert.calledWith(createReadStreamSpy, path.resolve("./test/assets/input.txt"));
+                sinon.assert.calledWith(createWriteStreamSpy, `${outputPath}${path.sep}output${path.sep}bee_default_output`);
                 callback(null, "Success");
             },
         };
@@ -95,12 +104,13 @@ describe("Testing test-utility", () => {
         const beeKey = path.resolve(argv[4]);
 
         const fs = require("fs");
-        const createWriteStreamSpy = sinon.spy(fs, "createWriteStream");
-        const createReadStreamSpy = sinon.spy(fs, "createReadStream");
 
         const stubs = {
             fs,
         };
+
+        const createWriteStreamSpy = sandbox.stub(fs, "createWriteStream");
+        const createReadStreamSpy = sandbox.stub(fs, "createReadStream");
 
         stubs[beeKey] = {
             flight: (services, data, callback) => {
@@ -109,13 +119,8 @@ describe("Testing test-utility", () => {
         };
 
         const utility = proxyquire("../src/test-utility", stubs);
-        const callback = (err) => {
-            try {
-                assert.equal(err.message, "Timed-out");
-                done();
-            } catch (assertionErr) {
-                done(assertionErr);
-            }
+        const callback = async (err) => {
+            done();
         };
 
         utility.runTest(argv, callback);
