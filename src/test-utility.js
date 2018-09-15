@@ -86,7 +86,6 @@ const runTest = (argv, callback) => {
         // TODO: Validation for fileName, what should happen if the user requests a writeStream for an
         // already created fileName
         // Create the services object
-        debugger;
         const readStream = fs.createReadStream(inputFilePath);
         const services = {
             // Just log a message to the system console
@@ -122,13 +121,11 @@ const runTest = (argv, callback) => {
                     }
 
                     const typePath = type === "wip" ? "workFiles" : "output";
-                    debugger;
                     const stream = fs.createWriteStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
                     streamArray.push(stream);
                     return stream;
                 },
                 getReadStream: (fileName, type) => {
-                    debugger;
                     const typePath = type === "wip" ? "workFiles" : "output";
                     const stream = fs.createReadStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
                     return stream;
