@@ -122,7 +122,7 @@ const runTest = (argv, callback) => {
 
                     const typePath = type === "wip" ? "workFiles" : "output";
                     const stream = fs.createWriteStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
-                    streamArray.push(stream);
+                    if (stream) streamArray.push(stream);
                     return stream;
                 },
                 getReadStream: (fileName, type) => {
