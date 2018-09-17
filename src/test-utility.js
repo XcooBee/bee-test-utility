@@ -155,8 +155,9 @@ const runTest = (argv, callback) => {
             smartLists: true,
             smartypants: false,
         });
-        const helpText = fs.readFileSync("./src/assets/help.md");
-        console.log(marked(helpText.toString("utf8")));
+        let helpText = fs.readFileSync("./src/assets/help.md");
+        if (helpText) helpText = helpText.toString("utf-8")
+        console.log(marked(`${helpText}`));
         return callback();
     }
 
