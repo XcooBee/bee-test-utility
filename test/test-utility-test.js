@@ -48,7 +48,7 @@ describe("Testing test-utility", () => {
     });
 
     it("Should show help info from help.md file", (done) => {
-        argv = [
+        const argv = [
             "",
             "path-to-script",
             "./test/assets/input.txt",
@@ -78,7 +78,7 @@ describe("Testing test-utility", () => {
     });
 
     it("Should result in error with incorrect size param", (done) => {
-        argv = [
+        const argv = [
             "",
             "path-to-script",
             "",
@@ -86,6 +86,7 @@ describe("Testing test-utility", () => {
             "k",
         ];
         beeKey = path.resolve(argv[4]);
+        const size = argv[4];
 
         stubs[beeKey] = {
             flight: (services, data, callback) => {
@@ -98,13 +99,41 @@ describe("Testing test-utility", () => {
 
         try {
             runTestSpy(argv, (err, result) => {
-                assert.equal(err.message, "'k' is not a valid size, must be one of [s, m, l]")
+                assert.equal(err.message, `'${size}' is not a valid size, must be one of [s, m, l]`)
                 done();
             });
         } catch (e) {
             console.log("");
         }
         // "k is not a valid size, must be one of [s, m, l]"
+    });
+
+    it("Should result in error with not existing output directory", (done) => {
+        const argv = [
+            "",
+            "path-to-script",
+            "",
+            "--out",
+            "fake-output-directory",
+        ];
+        beeKey = path.resolve(argv[4]);
+        const outputPath = path.resolve(argv[4]);
+
+        stubs[beeKey] = {
+            flight: (services, data, callback) => {
+                callback(null, "Success");
+            },
+        };
+        const utility = proxyquire("../src/test-utility", stubs);
+        const runTestSpy = sandbox.spy(utility.runTest);
+        try {
+            runTestSpy(argv, (err, result) => {
+                assert.equal(err.message, `${outputPath} is unknown`)
+                done();
+            });
+        } catch (e) {
+            console.log("");
+        }
     });
 
     it("Should create the read and write streams with proper values", (done) => {
@@ -121,6 +150,7 @@ describe("Testing test-utility", () => {
         const utility = proxyquire("../src/test-utility", stubs);
         utility.runTest(argv, (err, result) => {
             try {
+                debugger;
                 assert.equal("Success", result);
                 done();
             } catch (assertionErr) {
