@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "flight": "node src/test-utility.js",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec --timeout 60000",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec --exit --timeout 30000",
     "debug-tests": "mocha --inspect-brk test/test-utility-test.js --timeout 10000"
   },
   "repository": {

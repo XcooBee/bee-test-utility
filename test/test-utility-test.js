@@ -82,6 +82,36 @@ describe("Testing test-utility", () => {
         });
     });
 
+    it("Should result in error with incorrect size param", (done) => {
+        argv = [
+            "",
+            "path-to-script",
+            "",
+            "--size",
+            "k",
+        ];
+        beeKey = path.resolve(argv[4]);
+
+        stubs[beeKey] = {
+            flight: (services, data, callback) => {
+                callback(null, "Success");
+            },
+        };
+        const utility = proxyquire("../src/test-utility", stubs);
+        const runTestSpy = sandbox.spy(utility.runTest);
+
+
+        try {
+            runTestSpy(argv, (err, result) => {
+                assert.equal(err.message, "'k' is not a valid size, must be one of [s, m, l]")
+                done();
+            });
+        } catch (e) {
+            console.log("");
+        }
+        // "k is not a valid size, must be one of [s, m, l]"
+    });
+
     it("Should create the read and write streams with proper values", (done) => {
 
         stubs[beeKey] = {

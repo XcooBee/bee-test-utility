@@ -187,7 +187,6 @@ const runTest = (argv, callback) => {
     if (sizeIndex !== -1) {
         const validSizes = ["s", "m", "l"];
         size = argv[sizeIndex + 1].toLowerCase();
-
         if (validSizes.indexOf(size) === -1) {
             callback(new Error(`'${size}' is not a valid size, must be one of [s, m, l]`));
         }
