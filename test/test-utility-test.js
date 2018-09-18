@@ -76,6 +76,36 @@ describe("Testing test-utility", () => {
         });
     });
 
+    // it("Should throw an error when no input file", (done) => {
+    //     const argv = [
+    //         "",
+    //         "path-to-script",
+    //         "./test/assets/fake.txt",
+    //         "--bee",
+    //         "./test/assets/bee_simple.js",
+    //     ];
+    //     let beeKey = path.resolve(argv[4]);
+    //
+    //     stubs[beeKey] = {
+    //         flight: (services, data, callback) => {
+    //             callback(null, "Success");
+    //         },
+    //     };
+    //     const utility = proxyquire("../src/test-utility", stubs);
+    //     const runTestSpy = sandbox.spy(utility.runTest);
+    //     try {
+    //         runTestSpy(argv, (err) => {
+    //             assert.equal(
+    //                 err.message,
+    //                 `Input file '${inputFilePath}' doesn't exist`
+    //             );
+    //             done();
+    //         });
+    //     } catch (e) {
+    //         console.log("");
+    //     }
+    // });
+
     it("Should throw an error when received incorrect size param", (done) => {
         const argv = [
             "",
@@ -97,14 +127,13 @@ describe("Testing test-utility", () => {
 
 
         try {
-            runTestSpy(argv, (err, result) => {
+            runTestSpy(argv, (err) => {
                 assert.equal(err.message, `'${size}' is not a valid size, must be one of [s, m, l]`)
                 done();
             });
         } catch (e) {
             console.log("");
         }
-        // "k is not a valid size, must be one of [s, m, l]"
     });
 
     it("Should throw an error when no existing output directory", (done) => {
@@ -126,7 +155,7 @@ describe("Testing test-utility", () => {
         const utility = proxyquire("../src/test-utility", stubs);
         const runTestSpy = sandbox.spy(utility.runTest);
         try {
-            runTestSpy(argv, (err, result) => {
+            runTestSpy(argv, (err) => {
                 assert.equal(err.message, `${outputPath} is unknown`)
                 done();
             });
@@ -157,21 +186,6 @@ describe("Testing test-utility", () => {
         });
     });
 
-    it("Should throw a timeout error when callback is not called from bee", (done) => {
-        stubs[beeKey] = {
-            flight: (services, data, callback) => {
-                debugger;
-            },
-        };
-        const utility = proxyquire("../src/test-utility", stubs);
-        const callback = (err, res) => {
-            assert.equal(err.message, "Timed-out");
-            done();
-        };
-
-        utility.runTest(argv, callback);
-    });
-
     it("Should throw an error when no JSON file in params", (done) => {
         const argv = [
             "",
@@ -191,7 +205,7 @@ describe("Testing test-utility", () => {
         const utility = proxyquire("../src/test-utility", stubs);
         const runTestSpy = sandbox.spy(utility.runTest);
         try {
-            runTestSpy(argv, (err, result) => {
+            runTestSpy(argv, (err) => {
                 assert.equal(err.message, `${parametersFilePath} is not a valid JSON file`);
                 done();
             });
@@ -219,7 +233,7 @@ describe("Testing test-utility", () => {
         const utility = proxyquire("../src/test-utility", stubs);
         const runTestSpy = sandbox.spy(utility.runTest);
         try {
-            runTestSpy(argv, (err, result) => {
+            runTestSpy(argv, (err) => {
                 assert.equal(err.message, `${infoFilePath} doesn't exist`)
                 done();
             });
@@ -228,5 +242,83 @@ describe("Testing test-utility", () => {
         }
     });
 
-    
+    it("Should throw an error info file is not a JSON file", (done) => {
+        const argv = [
+            "",
+            "path-to-script",
+            "",
+            "--info",
+            "./test/assets/input.txt",
+        ];
+        let beeKey = path.resolve(argv[4]);
+        const infoFilePath = path.resolve(argv[4]);
+
+        stubs[beeKey] = {
+            flight: (services, data, callback) => {
+                callback(null, "Success");
+            },
+        };
+        const utility = proxyquire("../src/test-utility", stubs);
+        const runTestSpy = sandbox.spy(utility.runTest);
+        try {
+            runTestSpy(argv, (err) => {
+                debugger;
+                assert.equal(err.message, `${infoFilePath} is not a valid JSON file`);
+                done();
+            });
+        } catch (e) {
+            console.log("");
+        }
+    });
+
+    it("Should throw an error when unable to open a bee file", (done) => {
+        const argv = [
+            "",
+            "path-to-script",
+            "",
+            "--bee",
+            "fake-file",
+        ];
+        let beeKey = path.resolve(argv[4]);
+
+        stubs[beeKey] = {
+            flight: (services, data, callback) => {
+                callback(null, "Success");
+            },
+        };
+        const utility = proxyquire("../src/test-utility", stubs);
+        const runTestSpy = sandbox.spy(utility.runTest);
+        try {
+            runTestSpy(argv, (err) => {
+                debugger;
+                assert.equal(
+                    err.message,
+                    "It was not possible to load the bee, make sure you are inside a valid node project or use the '--bee' switch"
+                );
+                done();
+            });
+        } catch (e) {
+            console.log("");
+        }
+    });
+
+    //
+    // it("Should throw a timeout error when callback is not called from bee", (done) => {
+    //     stubs[beeKey] = {
+    //         flight: (services, data, callback) => {
+    //             callback(null, "Success");
+    //         },
+    //     };
+    //     const utility = proxyquire("../src/test-utility", stubs);
+    //     const runTestSpy = sandbox.spy(utility.runTest);
+    //     try {
+    //         runTestSpy(argv, (err) => {
+    //             assert.equal(err.message, "Timed-out");
+    //             done();
+    //         });
+    //     } catch (e) {
+    //         console.log("");
+    //     }
+    // });
+
 });
