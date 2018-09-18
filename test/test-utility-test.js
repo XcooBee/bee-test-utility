@@ -8,37 +8,30 @@ const fs = require("fs-extra");
 
 const sandbox = sinon.createSandbox();
 
-let argv = [];
-let beeKey = "";
-let createWriteStreamSpy = sandbox.stub(fs, "createWriteStream");
-let createReadStreamSpy = sandbox.stub(fs, "createReadStream");
-let stubs = {};
+let argv = [
+    "",
+    "path-to-script",
+    "./test/assets/input.txt",
+    "--bee",
+    "./test/assets/bee_simple.js",
+];
+let beeKey = path.resolve(argv[4]);
+let createWriteStreamSpy;
+let createReadStreamSpy;
+let stubs = { fs };
 
 describe("Testing test-utility", () => {
-
     beforeEach(() => {
-        argv = [
-            "",
-            "path-to-script",
-            "./test/assets/input.txt",
-            "--bee",
-            "./test/assets/bee_simple.js",
-        ];
-        beeKey = path.resolve(argv[4]);
-        sandbox.restore();
         createWriteStreamSpy = sandbox.stub(fs, "createWriteStream");
         createReadStreamSpy = sandbox.stub(fs, "createReadStream");
-        stubs = {
-            fs,
-        };
     });
+
+    afterEach(() => sandbox.restore());
 
     it("Should return proper ids when getNextId service is called", (done) => {
         stubs[beeKey] = {
             flight: (services, data, callback) => {
                 assert.equal(1, services.getNextId());
-                createReadStreamSpy.restore();
-                createWriteStreamSpy.restore();
                 callback(null, "Success");
             },
         };
@@ -65,6 +58,7 @@ describe("Testing test-utility", () => {
         beeKey = path.resolve(argv[4]);
         const readFileSyncSpy = sandbox.stub(fs, "readFileSync");
         const helpInfoPath = "./src/assets/help.md";
+
         stubs[beeKey] = {
             flight: (services, data, callback) => {
                 sinon.assert.calledWith(readFileSyncSpy, helpInfoPath);
@@ -75,6 +69,7 @@ describe("Testing test-utility", () => {
         const utility = proxyquire("../src/test-utility", stubs);
         utility.runTest(argv, (err, result) => {
             try {
+                assert.equal("Success", result);
                 done();
             } catch (assertionErr) {
                 done(assertionErr);
@@ -113,7 +108,6 @@ describe("Testing test-utility", () => {
     });
 
     it("Should create the read and write streams with proper values", (done) => {
-
         stubs[beeKey] = {
             flight: (services, data, callback) => {
                 const outputPath = path.resolve("./");
@@ -134,9 +128,8 @@ describe("Testing test-utility", () => {
             }
         });
     });
-
+/*
     it("Should throw a timeout error when callback is not called from bee", (done) => {
-
         stubs[beeKey] = {
             flight: (services, data, callback) => {
 
@@ -150,5 +143,5 @@ describe("Testing test-utility", () => {
         };
 
         utility.runTest(argv, callback);
-    });
+    });*/
 });
