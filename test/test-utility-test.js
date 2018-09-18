@@ -134,7 +134,7 @@ describe("Testing test-utility", () => {
             console.log("");
         }
     });
-    
+
     it("Should create the read and write streams with proper values", (done) => {
         stubs[beeKey] = {
             flight: (services, data, callback) => {
@@ -199,4 +199,34 @@ describe("Testing test-utility", () => {
             console.log("");
         }
     });
+
+    it("Should throw an error when no info file supplied", (done) => {
+        const argv = [
+            "",
+            "path-to-script",
+            "",
+            "--info",
+            "fake-file",
+        ];
+        let beeKey = path.resolve(argv[4]);
+        const infoFilePath = path.resolve(argv[4]);
+
+        stubs[beeKey] = {
+            flight: (services, data, callback) => {
+                callback(null, "Success");
+            },
+        };
+        const utility = proxyquire("../src/test-utility", stubs);
+        const runTestSpy = sandbox.spy(utility.runTest);
+        try {
+            runTestSpy(argv, (err, result) => {
+                assert.equal(err.message, `${infoFilePath} doesn't exist`)
+                done();
+            });
+        } catch (e) {
+            console.log("");
+        }
+    });
+
+    
 });
