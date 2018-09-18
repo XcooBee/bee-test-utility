@@ -158,7 +158,7 @@ const runTest = (argv, callback) => {
         let helpText = fs.readFileSync("./src/assets/help.md");
         if (helpText) helpText = helpText.toString("utf-8")
         console.log(marked(`${helpText}`));
-        return callback();
+        return callback(null, "Success");
     }
 
     const overWriteFiles = argv.indexOf("-o") !== -1;
