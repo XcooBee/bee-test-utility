@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "flight": "node src/test-utility.js",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec --exit --timeout 120000",
+    "debug-tests": "mocha --inspect-brk test/test-utility-test.js --timeout 10000"
   },
   "repository": {
     "type": "git",
@@ -22,18 +23,18 @@
   },
   "homepage": "https://github.com/XcooBee/bee-test-utility#readme",
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb-base": "^11.0.0",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "istanbul": "^0.4.5",
-    "mocha": "^3.2.0",
+    "mocha": "^5.2.0",
     "proxyquire": "^1.7.11",
-    "sinon": "^1.17.7"
+    "sinon": "^6.2.0"
   },
   "dependencies": {
     "chalk": "^1.1.3",
     "fs-extra": "^2.0.0",
-    "marked": "^0.3.6",
+    "marked": "^0.3.19",
     "marked-terminal": "^2.0.0"
   }
 }
