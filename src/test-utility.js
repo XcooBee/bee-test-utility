@@ -122,7 +122,7 @@ const runTest = (argv, callback) => {
 
                     const typePath = type === "wip" ? "workFiles" : "output";
                     const stream = fs.createWriteStream(`${outputPath}${path.sep}${typePath}${path.sep}${fileName}`);
-                    streamArray.push(stream);
+                    if (stream) streamArray.push(stream);
                     return stream;
                 },
                 getReadStream: (fileName, type) => {
@@ -155,9 +155,10 @@ const runTest = (argv, callback) => {
             smartLists: true,
             smartypants: false,
         });
-        const helpText = fs.readFileSync("./src/assets/help.md");
-        console.log(marked(helpText.toString("utf8")));
-        return callback();
+        let helpText = fs.readFileSync("./src/assets/help.md");
+        if (helpText) helpText = helpText.toString("utf-8")
+        console.log(marked(`${helpText}`));
+        return callback(null, "Success");
     }
 
     const overWriteFiles = argv.indexOf("-o") !== -1;
@@ -186,7 +187,6 @@ const runTest = (argv, callback) => {
     if (sizeIndex !== -1) {
         const validSizes = ["s", "m", "l"];
         size = argv[sizeIndex + 1].toLowerCase();
-
         if (validSizes.indexOf(size) === -1) {
             callback(new Error(`'${size}' is not a valid size, must be one of [s, m, l]`));
         }

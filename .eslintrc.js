@@ -24,6 +24,6 @@ module.exports = {
       "indent": ["error", 4],
       "quotes": ["error", "double", { "avoidEscape": true }],
       "no-trailing-spaces": ["error", { "skipBlankLines": true }],
-      "linebreak-style": ["off", "unix"]
-    }
+      "linebreak-style": ["off", "unix"],
+    },
 };
