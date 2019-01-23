@@ -8,17 +8,17 @@ const fs = require("fs-extra");
 
 const sandbox = sinon.createSandbox();
 
-let argv = [
+const argv = [
     "",
     "path-to-script",
     "./test/assets/input.txt",
     "--bee",
     "./test/assets/bee_simple.js",
 ];
-let beeKey = path.resolve(argv[4]);
+const beeKey = path.resolve(argv[4]);
 let createWriteStreamSpy;
 let createReadStreamSpy;
-let stubs = { fs };
+const stubs = { fs };
 
 describe("Testing test-utility", () => {
     beforeEach(() => {
@@ -48,7 +48,7 @@ describe("Testing test-utility", () => {
     });
 
     it("Should show help info from help.md file", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "./test/assets/input.txt",
@@ -66,7 +66,8 @@ describe("Testing test-utility", () => {
         };
 
         const utility = proxyquire("../src/test-utility", stubs);
-        utility.runTest(argv, (err, result) => {
+
+        utility.runTest(argvInt, (err, result) => {
             try {
                 assert.equal("Success", result);
                 done();
@@ -76,92 +77,59 @@ describe("Testing test-utility", () => {
         });
     });
 
-    // it("Should throw an error when no input file", (done) => {
-    //     const argv = [
-    //         "",
-    //         "path-to-script",
-    //         "./test/assets/fake.txt",
-    //         "--bee",
-    //         "./test/assets/bee_simple.js",
-    //     ];
-    //     let beeKey = path.resolve(argv[4]);
-    //
-    //     stubs[beeKey] = {
-    //         flight: (services, data, callback) => {
-    //             callback(null, "Success");
-    //         },
-    //     };
-    //     const utility = proxyquire("../src/test-utility", stubs);
-    //     const runTestSpy = sandbox.spy(utility.runTest);
-    //     try {
-    //         runTestSpy(argv, (err) => {
-    //             assert.equal(
-    //                 err.message,
-    //                 `Input file '${inputFilePath}' doesn't exist`
-    //             );
-    //             done();
-    //         });
-    //     } catch (e) {
-    //         console.log("");
-    //     }
-    // });
-
     it("Should throw an error when received incorrect size param", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--size",
             "k",
         ];
-        let beeKey = path.resolve(argv[4]);
-        const size = argv[4];
+        const beeKeyInt = path.resolve(argvInt[4]);
+        const size = argvInt[4];
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
 
-
-        try {
-            runTestSpy(argv, (err) => {
-                assert.equal(err.message, `'${size}' is not a valid size, must be one of [s, m, l]`)
+        utility.runTest(argvInt, (err) => {
+            try {
+                assert.equal(err.message, `'${size}' is not a valid size, must be one of [s, m, l]`);
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
 
     it("Should throw an error when no existing output directory", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--out",
             "fake-output-directory",
         ];
-        let beeKey = path.resolve(argv[4]);
-        const outputPath = path.resolve(argv[4]);
+        const beeKeyInt = path.resolve(argvInt[4]);
+        const outputPath = path.resolve(argvInt[4]);
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
-        try {
-            runTestSpy(argv, (err) => {
-                assert.equal(err.message, `${outputPath} is unknown`)
+        utility.runTest(argvInt, (err) => {
+            try {
+                assert.equal(err.message, `${outputPath} is unknown`);
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
 
     it("Should create the read and write streams with proper values", (done) => {
@@ -187,138 +155,112 @@ describe("Testing test-utility", () => {
     });
 
     it("Should throw an error when no JSON file in params", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--params",
             "./test/assets/input.txt",
         ];
-        let beeKey = path.resolve(argv[4]);
-        const parametersFilePath = path.resolve(argv[4]);
+        const beeKeyInt = path.resolve(argvInt[4]);
+        const parametersFilePath = path.resolve(argvInt[4]);
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
-        try {
-            runTestSpy(argv, (err) => {
+        utility.runTest(argvInt, (err) => {
+            try {
                 assert.equal(err.message, `${parametersFilePath} is not a valid JSON file`);
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
 
     it("Should throw an error when no info file supplied", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--info",
             "fake-file",
         ];
-        let beeKey = path.resolve(argv[4]);
-        const infoFilePath = path.resolve(argv[4]);
+        const beeKeyInt = path.resolve(argvInt[4]);
+        const infoFilePath = path.resolve(argvInt[4]);
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
-        try {
-            runTestSpy(argv, (err) => {
-                assert.equal(err.message, `${infoFilePath} doesn't exist`)
+        utility.runTest(argvInt, (err) => {
+            try {
+                assert.equal(err.message, `${infoFilePath} doesn't exist`);
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
 
     it("Should throw an error info file is not a JSON file", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--info",
             "./test/assets/input.txt",
         ];
-        let beeKey = path.resolve(argv[4]);
-        const infoFilePath = path.resolve(argv[4]);
+        const beeKeyInt = path.resolve(argvInt[4]);
+        const infoFilePath = path.resolve(argvInt[4]);
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
-        try {
-            runTestSpy(argv, (err) => {
-                debugger;
+        utility.runTest(argvInt, (err) => {
+            try {
                 assert.equal(err.message, `${infoFilePath} is not a valid JSON file`);
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
 
     it("Should throw an error when unable to open a bee file", (done) => {
-        const argv = [
+        const argvInt = [
             "",
             "path-to-script",
             "",
             "--bee",
             "fake-file",
         ];
-        let beeKey = path.resolve(argv[4]);
+        const beeKeyInt = path.resolve(argvInt[4]);
 
-        stubs[beeKey] = {
+        stubs[beeKeyInt] = {
             flight: (services, data, callback) => {
                 callback(null, "Success");
             },
         };
         const utility = proxyquire("../src/test-utility", stubs);
-        const runTestSpy = sandbox.spy(utility.runTest);
-        try {
-            runTestSpy(argv, (err) => {
-                debugger;
+        utility.runTest(argvInt, (err) => {
+            try {
                 assert.equal(
                     err.message,
                     "It was not possible to load the bee, make sure you are inside a valid node project or use the '--bee' switch"
                 );
                 done();
-            });
-        } catch (e) {
-            console.log("");
-        }
+            } catch (assertionErr) {
+                done(assertionErr);
+            }
+        });
     });
-
-    //
-    // it("Should throw a timeout error when callback is not called from bee", (done) => {
-    //     stubs[beeKey] = {
-    //         flight: (services, data, callback) => {
-    //             callback(null, "Success");
-    //         },
-    //     };
-    //     const utility = proxyquire("../src/test-utility", stubs);
-    //     const runTestSpy = sandbox.spy(utility.runTest);
-    //     try {
-    //         runTestSpy(argv, (err) => {
-    //             assert.equal(err.message, "Timed-out");
-    //             done();
-    //         });
-    //     } catch (e) {
-    //         console.log("");
-    //     }
-    // });
-
 });
