@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "flight": "node src/test-utility.js",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- test/*.js -R spec --exit --timeout 120000",
+    "test": "nyc --reporter=lcov npm run mocha",
+    "mocha": "_mocha test/*.js -R spec --exit --timeout 120000",
     "debug-tests": "mocha --inspect-brk test/test-utility-test.js --timeout 10000"
   },
   "repository": {
@@ -26,8 +27,8 @@
     "eslint": "^5.12.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.15.0",
-    "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
+    "nyc": "^14.1.1",
     "proxyquire": "^2.1.0",
     "sinon": "^7.2.2"
   },
