@@ -283,6 +283,7 @@ const runTest = (argv, callback) => {
             parametersContent = JSON.parse(fs.readFileSync(parametersFilePath, "utf8"));
             data.integrations = parametersContent.integrations;
             data.parameters = parametersContent.parameters;
+            data.metadata = parametersContent.metadata;
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
             data.transaction_key = parametersContent.transaction_key;
