@@ -48,3 +48,6 @@ dev-env
 
 # Folder used to output files
 out/
+
+# nyc files
+.nyc_output/**
