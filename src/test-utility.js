@@ -59,7 +59,7 @@ const runTest = (argv, callback) => {
 
     // contains information about input files
     let filesInfo = {};
-    
+
     // path to info file
     let infoFilePath = null;
 
@@ -134,7 +134,7 @@ const runTest = (argv, callback) => {
             getFileType: filename => (filesInfo[filename] && filesInfo[filename].file_type) || 999,
             getFileTags: filename => (filesInfo[filename] && filesInfo[filename].file_tags) || ["one", "two", "three"],
             validationError: field => services.log(`Input value for '${field}' is not correct`, "error"),
-            setBalanceLock: params => Promise.resolve(true),
+            setBalanceLock: () => Promise.resolve(true),
             getBeeParam: param => beeSystemParams[param],
         };
 
@@ -156,7 +156,7 @@ const runTest = (argv, callback) => {
             smartypants: false,
         });
         let helpText = fs.readFileSync("./src/assets/help.md");
-        if (helpText) helpText = helpText.toString("utf-8")
+        if (helpText) helpText = helpText.toString("utf-8");
         console.log(marked(`${helpText}`));
         return callback(null, "Success");
     }
@@ -171,10 +171,10 @@ const runTest = (argv, callback) => {
         const beeIndex = argv.indexOf("--bee");
         if (beeIndex !== -1) {
             pathToBee = path.resolve(argv[beeIndex + 1]);
-            beeModule = require(pathToBee);
+            beeModule = require(pathToBee); // eslint-disable-line import/no-dynamic-require
         } else {
             // TODO: Don't rely on cwd
-            beeModule = require(process.cwd());
+            beeModule = require(process.cwd()); // eslint-disable-line import/no-dynamic-require
         }
     } catch (err) {
         callback(new Error("It was not possible to load the bee, make sure you are inside a valid node project or use the '--bee' switch"));
@@ -269,11 +269,11 @@ const runTest = (argv, callback) => {
 
     const data = {};
 
-    const defaultUserData =  {
+    const defaultUserData = {
         first_name: "John",
         last_name: "Testerson",
         xcoobee_id: "~johnt",
-        locale: "en-us"
+        locale: "en-us",
     };
 
     let parametersContent = null;
@@ -283,6 +283,7 @@ const runTest = (argv, callback) => {
             parametersContent = JSON.parse(fs.readFileSync(parametersFilePath, "utf8"));
             data.integrations = parametersContent.integrations;
             data.parameters = parametersContent.parameters;
+            data.metadata = parametersContent.metadata;
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
             data.transaction_key = parametersContent.transaction_key;
@@ -368,7 +369,7 @@ space: ${issueSizeWarning ? chalk.red(totalSize) : chalk.green(totalSize)} bytes
 };
 
 if (require.main === module) {
-    const callback = (err, result) => {
+    const callback = (err) => {
         if (err) {
             console.log(`
 ==========================================
