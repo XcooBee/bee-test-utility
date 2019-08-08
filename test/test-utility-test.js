@@ -137,6 +137,7 @@ describe("Testing test-utility", () => {
             flight: (services, data, callback) => {
                 const outputPath = path.resolve("./");
                 services.writeStreamManager.getWriteStream("bee_default_output", "output");
+                services.readStream();
                 sinon.assert.calledWith(createReadStreamSpy, path.resolve("./test/assets/input.txt"));
                 sinon.assert.calledWith(createWriteStreamSpy, `${outputPath}${path.sep}output${path.sep}bee_default_output`);
                 callback(null, "Success");
