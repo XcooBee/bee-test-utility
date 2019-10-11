@@ -286,6 +286,7 @@ const runTest = (argv, callback) => {
             data.flightprocessing = parametersContent.flightprocessing;
             data.user_data = parametersContent.user_data || defaultUserData;
             data.transaction_key = parametersContent.transaction_key;
+            data.db_entity = parametersContent.db_entity;
             beeSystemParams = parametersContent.bee_system_params || {};
         } catch (err) {
             callback(new Error(`${parametersFilePath} is not a valid JSON file`));
